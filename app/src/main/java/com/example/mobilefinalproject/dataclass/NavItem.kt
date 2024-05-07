@@ -24,3 +24,8 @@ data class TabItem(
   val selectedIcon: ImageVector,
   val unselectedIcon: ImageVector,
 )
+
+data class ToggleableInfo(
+  val isChecked: Boolean,
+  val text: String,
+)

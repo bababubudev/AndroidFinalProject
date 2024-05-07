@@ -60,7 +60,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
       modifier = Modifier
         .fillMaxSize()
         .padding(padVal)
-        .padding(15.dp),
+        .padding(horizontal = 20.dp),
     )
     {
       Spacer(modifier = Modifier.height(30.dp))
@@ -87,7 +87,9 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
 
       Spacer(modifier = Modifier.height(100.dp))
 
-      Row{
+      Row(
+        modifier = Modifier.padding(horizontal = 20.dp)
+      ){
         Column {
           Row {
             Text(
@@ -166,10 +168,10 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
         }
       }
 
-      Spacer(modifier = Modifier.height(50.dp))
+      Spacer(modifier = Modifier.height(60.dp))
       HorizontalDivider()
 
-      Spacer(modifier = Modifier.height(50.dp))
+      Spacer(modifier = Modifier.height(60.dp))
 
       Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -179,13 +181,21 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
             modifier = Modifier.fillMaxWidth(0.5f),
             contentAlignment = Alignment.Center
           ) {
-            Row {
-              Icon(imageVector = Icons.Outlined.Compress, contentDescription = "pressure")
-              Spacer(modifier = Modifier.width(10.dp))
+            Column {
               Text(
-                text = weatherResponse?.main?.pressure.toString() + " hPa",
-                style = MaterialTheme.typography.titleSmall
+                text = "Pressure",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
+              Spacer(modifier = Modifier.height(10.dp))
+              Row {
+                Icon(imageVector = Icons.Outlined.Compress, contentDescription = "pressure")
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                  text = weatherResponse?.main?.pressure.toString() + " hPa",
+                  style = MaterialTheme.typography.titleSmall
+                )
+              }
             }
           }
 
@@ -193,32 +203,48 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
           ) {
-            Row {
-              Icon(imageVector = Icons.Default.TagFaces, contentDescription = "feels")
-              Spacer(modifier = Modifier.width(10.dp))
+            Column {
               Text(
-                text = "Feels like ${weatherResponse?.main?.feels_like?.toInt().toString()} °C",
-                style = MaterialTheme.typography.titleSmall
+                text = "Feels like",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
+              Spacer(modifier = Modifier.height(10.dp))
+              Row {
+                Icon(imageVector = Icons.Default.TagFaces, contentDescription = "feels")
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                  text = "${weatherResponse?.main?.feels_like?.toInt().toString()} °C",
+                  style = MaterialTheme.typography.titleSmall
+                )
+              }
             }
+
           }
         }
 
         Spacer(modifier = Modifier.height(50.dp))
-
 
         Row {
           Box(
             modifier = Modifier.fillMaxWidth(0.5f),
             contentAlignment = Alignment.Center
           ) {
-            Row {
-              Icon(imageVector = Icons.Outlined.Cloud, contentDescription = "cloud")
-              Spacer(modifier = Modifier.width(10.dp))
+            Column{
               Text(
-                text = weatherResponse?.clouds?.all.toString() + " %",
-                style = MaterialTheme.typography.titleSmall
+                text = "Cloud coverage",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
+              Spacer(modifier = Modifier.height(10.dp))
+              Row {
+                Icon(imageVector = Icons.Outlined.Cloud, contentDescription = "cloud")
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                  text = weatherResponse?.clouds?.all.toString() + " %",
+                  style = MaterialTheme.typography.titleSmall
+                )
+              }
             }
           }
 
@@ -226,13 +252,21 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
           ) {
-            Row {
-              Icon(imageVector = Icons.Outlined.Description, contentDescription = "description")
-              Spacer(modifier = Modifier.width(10.dp))
-              weatherResponse?.weather?.get(0)?.description?.let {
-                Text(
-                  text = it.capitalize(Locale.current), style = MaterialTheme.typography.titleSmall
-                )
+            Column{
+              Text(
+                text = "Description",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+              )
+              Spacer(modifier = Modifier.height(10.dp))
+              Row {
+                Icon(imageVector = Icons.Outlined.Description, contentDescription = "description")
+                Spacer(modifier = Modifier.width(10.dp))
+                weatherResponse?.weather?.get(0)?.description?.let {
+                  Text(
+                    text = it.capitalize(Locale.current), style = MaterialTheme.typography.titleSmall
+                  )
+                }
               }
             }
           }

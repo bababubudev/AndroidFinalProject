@@ -30,7 +30,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.mobilefinalproject.components.Header
 import com.example.mobilefinalproject.dataclass.ForecastResponse
 import com.example.mobilefinalproject.dataclass.WeatherItem
 import com.example.mobilefinalproject.navigation.BottomNavbar
@@ -51,7 +50,9 @@ fun WeatherItem(weatherItem: WeatherItem) {
   }
 
   Column(
-    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+    modifier = Modifier
+      .padding(16.dp)
+      .fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
@@ -79,10 +80,16 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
   var selectedItem by rememberSaveable { mutableIntStateOf(1) }
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-  val displayedDates = mutableSetOf<LocalDate>()
+  val filteredList = forecastResponse?.list
+    ?.groupBy { weatherItem -> LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE) }
+    ?.values
+    ?.map { it.first() }
+    ?: listOf()
 
   Scaffold(
-    modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
+    modifier = Modifier
+      .fillMaxSize()
+      .nestedScroll(scrollBehavior.nestedScrollConnection),
     bottomBar = {
       BottomNavbar(
         navController = navController,
@@ -92,7 +99,13 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
     },
     topBar = {
       TopAppBar(
-        title = { Header(text = "Forecast for 5 days") },
+        title = {
+          Text(
+            text = "Forecast for 5 days",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+          )
+        },
         navigationIcon = {
           IconButton(onClick = { navController.navigate("Today") }) {
             Icon(
@@ -108,14 +121,10 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
     LazyColumn(
       modifier = Modifier.padding(padVal)
     ) {
-      items(forecastResponse?.list ?: listOf()) { weatherItem ->
-        val forecastDate = LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE)
-
-        if (!displayedDates.contains(forecastDate)) {
-          WeatherItem(weatherItem = weatherItem)
-          displayedDates.add(forecastDate)
-        }
+      items(filteredList) { weatherItem ->
+        WeatherItem(weatherItem = weatherItem)
       }
     }
   }
 }
+
