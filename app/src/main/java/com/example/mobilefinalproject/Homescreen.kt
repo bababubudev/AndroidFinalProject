@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -35,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
@@ -65,7 +68,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
     {
       Spacer(modifier = Modifier.height(30.dp))
       Header(
-        text = weatherResponse?.name ?: "Loading..."
+        text = weatherResponse?.name ?: stringResource(id = R.string.loading)
       )
 
       Row(
@@ -111,7 +114,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
           Spacer(modifier = Modifier.height(10.dp))
 
           Text(
-            text = weatherResponse?.weather?.get(0)?.main ?: "Loading...",
+            text = weatherResponse?.weather?.get(0)?.main ?: stringResource(id = R.string.loading),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
           )
@@ -136,20 +139,27 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
         Spacer(modifier = Modifier.weight(1f))
 
         Column(
-          horizontalAlignment = Alignment.CenterHorizontally
+          horizontalAlignment = Alignment.End
         ) {
           Spacer(modifier = Modifier.height(15.dp))
           
           Row(
             modifier = Modifier
               .clip(RoundedCornerShape(15.dp))
-              .background(color = MaterialTheme.colorScheme.onPrimary)
-              .border(2.dp, MaterialTheme.colorScheme.onPrimary, RoundedCornerShape(15.dp))
+              .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+              .border(2.dp, Color.Transparent, RoundedCornerShape(15.dp))
               .padding(horizontal = 10.dp, vertical = 8.dp)
           ) {
-            Icon(imageVector = Icons.Outlined.WaterDrop, contentDescription = "rain")
+            Icon(
+              imageVector = Icons.Outlined.WaterDrop,
+              contentDescription = "rain",
+              tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = weatherResponse?.main?.humidity.toString() + " %")
+            Text(
+              text = weatherResponse?.main?.humidity.toString() + " %",
+              color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+            )
           }
           
           Spacer(modifier = Modifier.height(10.dp))
@@ -157,19 +167,29 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
           Row(
             modifier = Modifier
               .clip(RoundedCornerShape(15.dp))
-              .background(color = MaterialTheme.colorScheme.onPrimary)
-              .border(2.dp, MaterialTheme.colorScheme.onPrimary, RoundedCornerShape(15.dp))
+              .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+              .border(2.dp, Color.Transparent, RoundedCornerShape(15.dp))
               .padding(horizontal = 10.dp, vertical = 8.dp)
           ) {
-            Icon(imageVector = Icons.Outlined.WindPower, contentDescription = "Wind")
+            Icon(
+              imageVector = Icons.Outlined.WindPower,
+              contentDescription = "Wind",
+              tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = weatherResponse?.wind?.speed.toString() + " m")
+            Text(
+              text = weatherResponse?.wind?.speed.toString() + " m",
+              color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+            )
           }
         }
       }
 
       Spacer(modifier = Modifier.height(60.dp))
-      HorizontalDivider()
+      HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 30.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+      )
 
       Spacer(modifier = Modifier.height(60.dp))
 
@@ -183,7 +203,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
           ) {
             Column {
               Text(
-                text = "Pressure",
+                text = stringResource(id = R.string.pressure),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
@@ -199,13 +219,19 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
             }
           }
 
+          VerticalDivider(
+            modifier = Modifier
+              .height(50.dp)
+              .padding(top = 10.dp)
+          )
+
           Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
           ) {
             Column {
               Text(
-                text = "Feels like",
+                text = stringResource(id = R.string.feel_like),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
@@ -228,15 +254,16 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
         Row {
           Box(
             modifier = Modifier.fillMaxWidth(0.5f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
           ) {
             Column{
               Text(
-                text = "Cloud coverage",
+                text = stringResource(id = R.string.cloud_coverage),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
               Spacer(modifier = Modifier.height(10.dp))
+
               Row {
                 Icon(imageVector = Icons.Outlined.Cloud, contentDescription = "cloud")
                 Spacer(modifier = Modifier.width(10.dp))
@@ -248,13 +275,19 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
             }
           }
 
+          VerticalDivider(
+            modifier = Modifier
+              .height(50.dp)
+              .padding(top = 10.dp)
+          )
+
           Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
           ) {
             Column{
               Text(
-                text = "Description",
+                text = stringResource(id = R.string.description),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )

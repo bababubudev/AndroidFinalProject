@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -35,6 +36,7 @@ import com.example.mobilefinalproject.dataclass.WeatherItem
 import com.example.mobilefinalproject.navigation.BottomNavbar
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun WeatherItem(weatherItem: WeatherItem) {
@@ -44,9 +46,14 @@ fun WeatherItem(weatherItem: WeatherItem) {
   val daysDifference = forecastDate.toEpochDay() - currentDate.toEpochDay()
 
   val dateLabel = when (daysDifference) {
-    0L -> "Today"
-    1L -> "Tomorrow"
-    else -> "$daysDifference Days"
+    0L -> stringResource(R.string.home)
+    1L -> stringResource(R.string.tomorrow)
+    else -> forecastDate
+      .format(DateTimeFormatter.ofPattern("EEEE")
+        .withLocale(Locale.getDefault()))
+      .replaceFirstChar { if (it.isLowerCase())
+        it.titlecase(Locale.getDefault()) else
+          it.toString() }
   }
 
   Column(
@@ -101,7 +108,7 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
       TopAppBar(
         title = {
           Text(
-            text = "Forecast for 5 days",
+            text = stringResource(R.string.forecast_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
           )

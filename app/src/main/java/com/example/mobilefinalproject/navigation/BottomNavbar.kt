@@ -14,8 +14,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
+import com.example.mobilefinalproject.R
 import com.example.mobilefinalproject.dataclass.NavItem
 
 @Composable
@@ -26,22 +28,25 @@ fun BottomNavbar(
 ) {
   val items = listOf(
     NavItem(
-      title = "Today",
+      title = stringResource(id = R.string.home),
       selectedIcon = Icons.Filled.Today,
       unselectedIcon = Icons.Outlined.Today,
-      hasNews = false
-    ),
-    NavItem(
-      title = "5 Days",
-      selectedIcon = Icons.Filled.CalendarMonth,
-      unselectedIcon = Icons.Outlined.CalendarMonth,
+      navTitle = "Today",
       hasNews = false,
     ),
     NavItem(
-      title = "Settings",
+      title = stringResource(id = R.string.forecast),
+      selectedIcon = Icons.Filled.CalendarMonth,
+      unselectedIcon = Icons.Outlined.CalendarMonth,
+      navTitle = "5 Days",
+      hasNews = false,
+    ),
+    NavItem(
+      title = stringResource(id = R.string.setting),
       selectedIcon = Icons.Filled.Settings,
       unselectedIcon = Icons.Outlined.Settings,
-      hasNews = false
+      navTitle = "Settings",
+      hasNews = false,
     ),
   )
 
@@ -58,7 +63,7 @@ fun BottomNavbar(
         selected = selectedItem == ind,
         onClick = {
           onItemSeleted(ind)
-          navController.navigate(item.title, noAnimationNavOptions)
+          navController.navigate(item.navTitle, noAnimationNavOptions)
         },
         label = {
           Text(text = item.title)

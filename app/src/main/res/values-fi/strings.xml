@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Säät</string>
+    <string name="home">Tänään</string>
+    <string name="forecast">5 Päivät</string>
+    <string name="setting">Asetukset</string>
+    <string name="pressure">Paine</string>
+    <string name="feel_like">Tuntuu kuin</string>
+    <string name="cloud_coverage">"Pilvipeite‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ "</string>
+    <string name="description">Kuvaus</string>
+    <string name="tomorrow">Huomenna</string>
+    <string name="dark_mode">Pimeä tila</string>
+    <string name="language">Valitse kieli</string>
+    <string name="permission_req">Lupa Vaadiataan</string>
+    <string name="permission_grant">Lupa Myönnetty</string>
+    <string name="loading">Lataa...</string>
+    <string name="forecast_title">5 päivän ennuste</string>
+</resources>

@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">MobileFinalProject</string>
+    <string name="app_name">Weathers</string>
+    <string name="home">Today</string>
+    <string name="forecast">5 days</string>
+    <string name="setting">Settings</string>
+    <string name="pressure">Pressure</string>
+    <string name="feel_like">Feels like</string>
+    <string name="cloud_coverage">Cloud coverage</string>
+    <string name="description">Description</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="language">Select language</string>
+    <string name="permission_req">Permission Required</string>
+    <string name="permission_grant">Permission Granted</string>
+    <string name="loading">Loading...</string>
+    <string name="forecast_title">Forecast for 5 days</string>
 </resources>
