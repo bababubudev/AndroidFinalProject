@@ -15,4 +15,7 @@
     <string name="permission_grant">Lupa Myönnetty</string>
     <string name="loading">Lataa...</string>
     <string name="forecast_title">5 päivän ennuste</string>
+    <string name="temp">Lämpötila</string>
+    <string name="humid">Kosteus</string>
+    <string name="wind">Tuulivoima</string>
 </resources>

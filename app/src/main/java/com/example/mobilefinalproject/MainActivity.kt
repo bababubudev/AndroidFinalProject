@@ -123,7 +123,7 @@ private fun Main(
 
   var currentWeather by remember { mutableStateOf<WeatherResponse?>(null) }
   var forecastWeather by remember { mutableStateOf<ForecastResponse?>(null) }
-  var isLoading by rememberSaveable { mutableStateOf(false) }
+  var isLoading by rememberSaveable { mutableStateOf(true) }
 
   val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -132,9 +132,8 @@ private fun Main(
   Log.d("Location", "Lat: $lat, Long: $lon")
 
   if (lat != null && lon != null) {
-    LaunchedEffect(locationModel.currentLocation) {
+    LaunchedEffect(lat, lon) {
       try {
-        isLoading = true
         currentWeather = retrofitInstance.getWeather(lon, lat, "metric", BuildConfig.API_KEY)
         forecastWeather = retrofitInstance.getForecast(lon, lat, 40, "metric", BuildConfig.API_KEY)
         isLoading = false

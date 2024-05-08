@@ -14,4 +14,7 @@
     <string name="permission_grant">Permission Granted</string>
     <string name="loading">Loading...</string>
     <string name="forecast_title">Forecast for 5 days</string>
+    <string name="temp">Temperature</string>
+    <string name="humid">Humidity</string>
+    <string name="wind">Wind</string>
 </resources>

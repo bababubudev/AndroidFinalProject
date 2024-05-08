@@ -1,6 +1,7 @@
 package com.example.mobilefinalproject
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,7 +61,6 @@ fun WeatherItem(weatherItem: WeatherItem) {
     modifier = Modifier
       .padding(16.dp)
       .fillMaxWidth(),
-    horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
       text = dateLabel,
@@ -68,11 +68,24 @@ fun WeatherItem(weatherItem: WeatherItem) {
       fontWeight = FontWeight.Bold
     )
 
-    Spacer(modifier = Modifier.height(10.dp))
+    Spacer(modifier = Modifier.height(40.dp))
 
-    Text("${weatherItem.main.temp} °C")
-    Text("${weatherItem.main.humidity} %")
-    Text("${weatherItem.wind.speed} m/s")
+    Row{
+      Column {
+        Text(stringResource(R.string.temp), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+        Text("${weatherItem.main.temp} °C")
+      }
+      Spacer(modifier = Modifier.weight(1f))
+      Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(stringResource(R.string.humid), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+        Text("${weatherItem.main.humidity} %")
+      }
+      Spacer(modifier = Modifier.weight(1f))
+      Column(horizontalAlignment = Alignment.End) {
+        Text(stringResource(R.string.wind), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+        Text("${weatherItem.wind.speed} m")
+      }
+    }
   }
   
   Spacer(modifier = Modifier.height(10.dp))
