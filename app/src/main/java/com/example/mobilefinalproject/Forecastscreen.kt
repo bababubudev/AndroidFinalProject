@@ -34,16 +34,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.mobilefinalproject.dataclass.ForcastMain
 import com.example.mobilefinalproject.dataclass.ForecastResponse
+import com.example.mobilefinalproject.dataclass.ForecastWind
 import com.example.mobilefinalproject.dataclass.WeatherItem
 import com.example.mobilefinalproject.navigation.BottomNavbar
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun WeatherItem(weatherItem: WeatherItem) {
-
   val forecastDate = LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE)
   val currentDate = LocalDate.now()
   val daysDifference = forecastDate.toEpochDay() - currentDate.toEpochDay()
@@ -91,7 +93,7 @@ fun WeatherItem(weatherItem: WeatherItem) {
     Row{
       Column {
         Text(stringResource(R.string.temp), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-        Text("${weatherItem.main.temp} °C")
+        Text("${weatherItem.main.temp.roundToInt()} °C")
       }
       Spacer(modifier = Modifier.weight(1f))
       Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -101,7 +103,7 @@ fun WeatherItem(weatherItem: WeatherItem) {
       Spacer(modifier = Modifier.weight(1f))
       Column(horizontalAlignment = Alignment.End) {
         Text(stringResource(R.string.wind), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-        Text("${weatherItem.wind.speed} m")
+        Text("${weatherItem.wind.speed.roundToInt()} m")
       }
     }
   }
@@ -118,11 +120,42 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
   var selectedItem by rememberSaveable { mutableIntStateOf(1) }
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-  val filteredList = forecastResponse?.list
+  val groupedByDay = forecastResponse?.list
     ?.groupBy { weatherItem -> LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE) }
-    ?.values
-    ?.map { it.first() }
-    ?: listOf()
+    ?: mapOf()
+
+  val averagedList = groupedByDay.map { (date, weatherItems) ->
+    val avgTemp = weatherItems.map { it.main.temp }.average()
+    val avgHumidity = weatherItems.map { it.main.humidity }.average()
+    val avgWindSpeed = weatherItems.map { it.wind.speed }.average()
+
+    WeatherItem(
+      dt = weatherItems.first().dt,
+      main = ForcastMain(
+        temp = avgTemp,
+        feels_like = weatherItems.first().main.feels_like,
+        temp_min = weatherItems.first().main.temp_min,
+        temp_max = weatherItems.first().main.temp_max,
+        pressure = weatherItems.first().main.pressure,
+        sea_level = weatherItems.first().main.sea_level,
+        grnd_level = weatherItems.first().main.grnd_level,
+        humidity = avgHumidity.toInt(),
+        temp_kf = weatherItems.first().main.temp_kf
+      ),
+      weather = weatherItems.first().weather,
+      clouds = weatherItems.first().clouds,
+      wind = ForecastWind(
+        speed = avgWindSpeed,
+        deg = weatherItems.first().wind.deg,
+        gust = weatherItems.first().wind.gust
+      ),
+      visibility = weatherItems.first().visibility,
+      pop = weatherItems.first().pop,
+      rain = weatherItems.first().rain,
+      sys = weatherItems.first().sys,
+      dt_txt = weatherItems.first().dt_txt
+    )
+  }
 
   Scaffold(
     modifier = Modifier
@@ -159,7 +192,7 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
     LazyColumn(
       modifier = Modifier.padding(padVal)
     ) {
-      items(filteredList) { weatherItem ->
+      items(averagedList) { weatherItem ->
         WeatherItem(weatherItem = weatherItem)
       }
     }
