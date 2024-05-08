@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -62,11 +64,27 @@ fun WeatherItem(weatherItem: WeatherItem) {
       .padding(16.dp)
       .fillMaxWidth(),
   ) {
-    Text(
-      text = dateLabel,
-      style = MaterialTheme.typography.titleLarge,
-      fontWeight = FontWeight.Bold
-    )
+    Column {
+      Text(
+        text = dateLabel,
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Bold
+      )
+      Row {
+        Icon(
+          imageVector = Icons.Outlined.DateRange,
+          contentDescription = "date",
+          tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+          modifier = Modifier.width(20.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+          text = forecastDate.format(DateTimeFormatter.ofPattern("dd.MM")),
+          style = MaterialTheme.typography.titleSmall,
+          color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+        )
+      }
+    }
 
     Spacer(modifier = Modifier.height(40.dp))
 
