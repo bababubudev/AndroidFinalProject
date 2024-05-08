@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
 
     locationClient = DefaultLocationClient(
       applicationContext,
-      LocationServices.getFusedLocationProviderClient(applicationContext)
+      LocationServices.getFusedLocationProviderClient(applicationContext),
     )
 
     languageManager = LanguageManager(this)
@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
             isLoading.value = true
             loadingString.intValue = R.string.loading
             locationClient
-              .getLocationUpdates(1000L)
+              .getLocationUpdates(10000L)
               .catch {
                 e -> e.printStackTrace()
                 loadingString.intValue =  R.string.loading_fail
@@ -179,7 +179,7 @@ private fun Main(
   Log.d("Location", "Lat: $lat, Long: $lon")
 
   if (lat != null && lon != null) {
-    LaunchedEffect(lat, lon) {
+    LaunchedEffect(Unit) {
       try {
         isLoading.value = true
         loadingString.value = R.string.loading_data
@@ -216,7 +216,7 @@ private fun Main(
         }
       }
       else {
-        composable("Today") {
+        val settingComp: @Composable () -> Unit = {
           SettingScreen(
             navController,
             locationPermissionState,
@@ -226,25 +226,11 @@ private fun Main(
             restartApp
           )
         }
-        composable("5 Days") {
-          SettingScreen(
-            navController,
-            locationPermissionState,
-            darkThemeState,
-            languageState,
-            languageManager,
-            restartApp
-          )
-        }
+
+        composable("Today") { settingComp() }
+        composable("5 Days") { settingComp() }
         composable("Settings") {
-          SettingScreen(
-            navController,
-            locationPermissionState,
-            darkThemeState,
-            languageState,
-            languageManager,
-            restartApp
-          )
+          settingComp()
         }
       }
 

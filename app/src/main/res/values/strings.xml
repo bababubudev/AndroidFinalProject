@@ -18,7 +18,7 @@
     <string name="humid">Humidity</string>
     <string name="wind">Wind</string>
     <string name="restart">Restart</string>
-    <string name="loading_fail">location not found :/</string>
+    <string name="loading_fail">turn location on and restart!</string>
     <string name="loading_data">fetching weather</string>
     <string name="data_failed">failed to fetch :/</string>
 </resources>

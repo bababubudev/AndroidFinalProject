@@ -19,7 +19,7 @@
     <string name="humid">Kosteus</string>
     <string name="wind">Tuulivoima</string>
     <string name="restart">Käynnistä uudelleen</string>
-    <string name="loading_fail">sijaintia ei löytynyt :/</string>
+    <string name="loading_fail">laita sijainti päälle ja käynnistä uudelleen!</string>
     <string name="loading_data">haetaan säätä</string>
     <string name="data_failed">hakeminen epäonnistui :/</string>
 </resources>
