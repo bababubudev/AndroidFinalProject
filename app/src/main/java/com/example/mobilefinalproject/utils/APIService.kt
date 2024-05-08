@@ -21,6 +21,7 @@ interface APIService {
     @Query("lat") lat: Double,
     @Query("cnt") count: Int,
     @Query("units") units: String,
-    @Query("appid") appid: String
+    @Query("appid") appid: String,
+    @Query("lang") lang: String = "en"
   ): ForecastResponse
 }

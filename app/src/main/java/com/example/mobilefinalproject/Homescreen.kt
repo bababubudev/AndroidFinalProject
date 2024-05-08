@@ -71,8 +71,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
         text = weatherResponse?.name ?: stringResource(id = R.string.loading)
       )
 
-      Row(
-      ) {
+      Row {
         Icon(
           imageVector = Icons.Outlined.LocationOn,
           contentDescription = "Current location",
@@ -186,10 +185,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
       }
 
       Spacer(modifier = Modifier.height(60.dp))
-      HorizontalDivider(
-        modifier = Modifier.padding(horizontal = 30.dp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-      )
+      HorizontalDivider(modifier = Modifier.padding(horizontal = 10.dp))
 
       Spacer(modifier = Modifier.height(60.dp))
 

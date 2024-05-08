@@ -13,9 +13,13 @@
     <string name="language">Valitse kieli</string>
     <string name="permission_req">Lupa Vaadiataan</string>
     <string name="permission_grant">Lupa Myönnetty</string>
-    <string name="loading">Lataa...</string>
+    <string name="loading">haetaan sijaintia</string>
     <string name="forecast_title">5 päivän ennuste</string>
     <string name="temp">Lämpötila</string>
     <string name="humid">Kosteus</string>
     <string name="wind">Tuulivoima</string>
+    <string name="restart">Käynnistä uudelleen</string>
+    <string name="loading_fail">sijaintia ei löytynyt :/</string>
+    <string name="loading_data">haetaan säätä</string>
+    <string name="data_failed">hakeminen epäonnistui :/</string>
 </resources>

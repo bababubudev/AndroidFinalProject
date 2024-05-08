@@ -11,13 +11,16 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +43,7 @@ import com.example.mobilefinalproject.utils.LocationClient
 import com.example.mobilefinalproject.utils.LocationViewModel
 import com.example.mobilefinalproject.utils.RetrofitInstance
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.catch
@@ -57,7 +63,7 @@ class MainActivity : ComponentActivity() {
     super.attachBaseContext(context)
   }
 
-  private fun Restart() {
+  private fun restart() {
     this.recreate()
   }
 
@@ -84,6 +90,8 @@ class MainActivity : ComponentActivity() {
     setContent {
       val darkThemeState = rememberSaveable {mutableStateOf(true) }
       val languageState = rememberSaveable { mutableStateOf(languageManager.getLanguage()) }
+      val isLoading = remember { mutableStateOf(false) }
+      val loadingString = remember { mutableIntStateOf(R.string.loading) }
 
       MobileFinalProjectTheme(
         darkTheme = darkThemeState.value
@@ -92,17 +100,32 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
           LaunchedEffect(Unit) {
+            isLoading.value = true
+            loadingString.intValue = R.string.loading
             locationClient
               .getLocationUpdates(1000L)
-              .catch { e -> e.printStackTrace() }
+              .catch {
+                e -> e.printStackTrace()
+                loadingString.intValue =  R.string.loading_fail
+              }
               .collect { location ->
                 val lat = location.latitude
                 val lon = location.longitude
                 locationModel.updateLocation(LocationData(lat, lon))
+                isLoading.value = false
               }
           }
 
-          Main(locationModel, darkThemeState, languageState, languageManager, ::Restart)
+          Main(
+            locationModel,
+            locationClient,
+            darkThemeState,
+            languageState,
+            languageManager,
+            isLoading,
+            loadingString,
+            ::restart
+          )
         }
       }
     }
@@ -113,9 +136,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun Main(
   locationModel: LocationViewModel,
+  locationClient: LocationClient,
   darkThemeState: MutableState<Boolean>,
   languageState: MutableState<String?>,
   languageManager: LanguageManager,
+  isLoading: MutableState<Boolean>,
+  loadingString: MutableState<Int>,
   restartApp: () -> Unit
 ) {
   val navController = rememberNavController()
@@ -123,9 +149,30 @@ private fun Main(
 
   var currentWeather by remember { mutableStateOf<WeatherResponse?>(null) }
   var forecastWeather by remember { mutableStateOf<ForecastResponse?>(null) }
-  var isLoading by rememberSaveable { mutableStateOf(true) }
 
   val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
+  if (!locationPermissionState.status.isGranted) {
+    isLoading.value = false
+  }
+
+  LaunchedEffect(locationPermissionState.status.isGranted) {
+    if (locationPermissionState.status.isGranted) {
+      isLoading.value = true
+      loadingString.value = R.string.loading
+      locationClient
+        .getLocationUpdates(1000L)
+        .catch {
+            e -> e.printStackTrace()
+          loadingString.value =  R.string.loading_fail
+        }
+        .collect { location ->
+          val lat = location.latitude
+          val lon = location.longitude
+          locationModel.updateLocation(LocationData(lat, lon))
+          isLoading.value = false
+        }
+    }
+  }
 
   val lat = locationModel.currentLocation?.latitude
   val lon = locationModel.currentLocation?.longitude
@@ -134,14 +181,16 @@ private fun Main(
   if (lat != null && lon != null) {
     LaunchedEffect(lat, lon) {
       try {
+        isLoading.value = true
+        loadingString.value = R.string.loading_data
         currentWeather = retrofitInstance.getWeather(lon, lat, "metric", BuildConfig.API_KEY)
         forecastWeather = retrofitInstance.getForecast(lon, lat, 40, "metric", BuildConfig.API_KEY)
-        isLoading = false
+        isLoading.value = false
       } catch (e: LocationClient.LocationException) {
-        isLoading = false
         println("Location Exception: ${e.message}")
+        loadingString.value = R.string.data_failed
       } catch (e: Exception) {
-        isLoading = false
+        isLoading.value = false
         println("General Exception: ${e.message}")
       }
     }
@@ -150,32 +199,74 @@ private fun Main(
   Box(modifier = Modifier.fillMaxSize()) {
     NavHost(
       navController = navController,
-      startDestination = "Today",
+      startDestination = if (locationPermissionState.status.isGranted) "Today" else "Settings",
     ) {
-      composable("Today") { HomeScreen(navController, currentWeather) }
-      composable("5 Days") { ForecastScreen(navController, forecastWeather) }
-      composable("Settings") {
-        SettingScreen(
-          navController,
-          locationPermissionState,
-          darkThemeState,
-          languageState,
-          languageManager,
-          restartApp
-        )
+      if (locationPermissionState.status.isGranted) {
+        composable("Today") { HomeScreen(navController, currentWeather) }
+        composable("5 Days") { ForecastScreen(navController, forecastWeather) }
+        composable("Settings") {
+          SettingScreen(
+            navController,
+            locationPermissionState,
+            darkThemeState,
+            languageState,
+            languageManager,
+            restartApp
+          )
+        }
       }
+      else {
+        composable("Today") {
+          SettingScreen(
+            navController,
+            locationPermissionState,
+            darkThemeState,
+            languageState,
+            languageManager,
+            restartApp
+          )
+        }
+        composable("5 Days") {
+          SettingScreen(
+            navController,
+            locationPermissionState,
+            darkThemeState,
+            languageState,
+            languageManager,
+            restartApp
+          )
+        }
+        composable("Settings") {
+          SettingScreen(
+            navController,
+            locationPermissionState,
+            darkThemeState,
+            languageState,
+            languageManager,
+            restartApp
+          )
+        }
+      }
+
+
     }
 
-    if (isLoading) {
+    if (isLoading.value) {
       Box(
         modifier = Modifier
           .fillMaxSize()
-          .background(Color.Black.copy(alpha = 0.6f)),
+          .background(Color.Black.copy(alpha = 0.6f))
+          .padding(bottom = 40.dp),
         contentAlignment = Alignment.Center
-      ){
+      ) {
         CircularProgressIndicator(
-          modifier = Modifier.align(Alignment.Center),
-          strokeCap = StrokeCap.Round
+          modifier = Modifier.align(Alignment.Center), strokeCap = StrokeCap.Round
+        )
+
+        Text(
+          text= stringResource(id = loadingString.value),
+          modifier = Modifier.padding(top = 80.dp),
+          color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
         )
       }
     }
