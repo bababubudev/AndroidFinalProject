@@ -1,5 +1,8 @@
 package com.example.mobilefinalproject
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.WaterDrop
+import androidx.compose.material.icons.outlined.WindPower
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,6 +37,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,44 +76,169 @@ fun WeatherItem(weatherItem: WeatherItem) {
       .padding(16.dp)
       .fillMaxWidth(),
   ) {
-    Column {
-      Text(
-        text = dateLabel,
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold
-      )
-      Row {
-        Icon(
-          imageVector = Icons.Outlined.DateRange,
-          contentDescription = "date",
-          tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-          modifier = Modifier.width(20.dp)
-        )
-        Spacer(modifier = Modifier.width(10.dp))
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween
+    ){
+      Column {
         Text(
-          text = forecastDate.format(DateTimeFormatter.ofPattern("dd.MM")),
-          style = MaterialTheme.typography.titleSmall,
-          color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+          text = dateLabel,
+          style = MaterialTheme.typography.titleLarge,
+          fontWeight = FontWeight.Bold
         )
+        Row {
+          Icon(
+            imageVector = Icons.Outlined.DateRange,
+            contentDescription = "date",
+            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+            modifier = Modifier.width(20.dp)
+          )
+          Spacer(modifier = Modifier.width(10.dp))
+          Text(
+            text = forecastDate.format(DateTimeFormatter.ofPattern("dd.MM")),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+          )
+        }
+      }
+
+      Column {
+        Row {
+          Icon(
+            imageVector = Icons.Outlined.ArrowUpward,
+            contentDescription = "max",
+            modifier = Modifier.width(15.dp),
+            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+          )
+          Spacer(modifier = Modifier.width(5.dp))
+          Text(
+            text = "${weatherItem.main.temp_max.roundToInt()} °C",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold
+          )
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+        HorizontalDivider(modifier = Modifier.width(50.dp))
+        Spacer(modifier = Modifier.height(5.dp))
+        
+        Row {
+          Icon(
+            imageVector = Icons.Outlined.ArrowDownward,
+            contentDescription = "max",
+            modifier = Modifier.width(15.dp),
+            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+          )
+          Spacer(modifier = Modifier.width(5.dp))
+          Text(
+            text = "${weatherItem.main.temp_min.roundToInt()} °C",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold
+          )
+        }
       }
     }
 
     Spacer(modifier = Modifier.height(40.dp))
 
-    Row{
-      Column {
-        Text(stringResource(R.string.temp), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-        Text("${weatherItem.main.temp.roundToInt()} °C")
-      }
-      Spacer(modifier = Modifier.weight(1f))
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 15.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ){
       Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(stringResource(R.string.humid), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-        Text("${weatherItem.main.humidity} %")
+        Row {
+          Text(
+            "${weatherItem.main.temp.roundToInt()}",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+          )
+          Text(
+            "°C",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+          )
+        }
+        Text(
+          text = weatherItem.weather[0].main,
+          style = MaterialTheme.typography.titleSmall,
+          color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+        )
       }
-      Spacer(modifier = Modifier.weight(1f))
-      Column(horizontalAlignment = Alignment.End) {
-        Text(stringResource(R.string.wind), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-        Text("${weatherItem.wind.speed.roundToInt()} m")
+
+      Row {
+          Column(
+            modifier = Modifier
+              .clip(RoundedCornerShape(15.dp))
+              .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+              .border(2.dp, Color.Transparent, RoundedCornerShape(15.dp))
+              .padding(10.dp)
+          ) {
+            Text(
+              text = stringResource(id = R.string.humid),
+              style = MaterialTheme.typography.titleSmall,
+              color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.height(5.dp))
+            Row {
+              Icon(
+                imageVector = Icons.Outlined.WaterDrop,
+                contentDescription = "humidity",
+                modifier = Modifier.width(20.dp),
+                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+              )
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(
+                "${weatherItem.main.humidity}",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+              )
+              Text(
+                text = " %",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.width(10.dp))
+        
+          Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+              .clip(RoundedCornerShape(15.dp))
+              .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+              .border(2.dp, Color.Transparent, RoundedCornerShape(15.dp))
+              .padding(10.dp)
+          ) {
+            Text(
+              text = stringResource(id = R.string.wind),
+              style = MaterialTheme.typography.titleSmall,
+              color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.height(5.dp))
+            Row {
+              Icon(
+                imageVector = Icons.Outlined.WindPower,
+                contentDescription = "humidity",
+                modifier = Modifier.width(20.dp),
+                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+              )
+              Spacer(modifier = Modifier.width(5.dp))
+              Text(
+                "${weatherItem.wind.speed.roundToInt()}",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+              )
+              Text(
+                text = " m",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+              )
+            }
+          }
       }
     }
   }
@@ -124,18 +259,20 @@ fun ForecastScreen(navController: NavController, forecastResponse: ForecastRespo
     ?.groupBy { weatherItem -> LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE) }
     ?: mapOf()
 
-  val averagedList = groupedByDay.map { (date, weatherItems) ->
+  val averagedList = groupedByDay.map { (_, weatherItems: List<WeatherItem>) ->
     val avgTemp = weatherItems.map { it.main.temp }.average()
     val avgHumidity = weatherItems.map { it.main.humidity }.average()
     val avgWindSpeed = weatherItems.map { it.wind.speed }.average()
+    val avgMaxTemp = weatherItems.map { it.main.temp_max }.average()
+    val avgMinTemp = weatherItems.map { it.main.temp_min }.average()
 
     WeatherItem(
       dt = weatherItems.first().dt,
       main = ForcastMain(
         temp = avgTemp,
         feels_like = weatherItems.first().main.feels_like,
-        temp_min = weatherItems.first().main.temp_min,
-        temp_max = weatherItems.first().main.temp_max,
+        temp_min = avgMinTemp,
+        temp_max = avgMaxTemp,
         pressure = weatherItems.first().main.pressure,
         sea_level = weatherItems.first().main.sea_level,
         grnd_level = weatherItems.first().main.grnd_level,
