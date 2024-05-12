@@ -21,11 +21,13 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.LocationOff
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.icons.outlined.WindPower
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +52,7 @@ import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mobilefinalproject.components.Header
@@ -58,11 +61,18 @@ import com.example.mobilefinalproject.navigation.BottomNavbar
 import com.example.mobilefinalproject.navigation.PopupSearchBar
 
 @Composable
-fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, currentCity: MutableState<String>, restart: () -> Unit) {
+fun HomeScreen(
+  navController: NavController,
+  weatherResponse: WeatherResponse,
+  currentCity: MutableState<String>,
+  searchByCity: MutableState<Boolean>,
+  restart: () -> Unit
+) {
   var selectedItem by rememberSaveable { mutableIntStateOf(0) }
 
   var showSearch by rememberSaveable { mutableStateOf(false) }
   var query by remember { mutableStateOf("") }
+  var showPopup by remember { mutableStateOf(false) }
 
   Scaffold(bottomBar = {
     BottomNavbar(
@@ -83,17 +93,23 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
         PopupSearchBar(
           query = query,
           onQueryChange = {newQuery -> query = newQuery},
-          onExecuteSearch = { currentCity.value = query.trim(); query = ""; showSearch = false },
+          onExecuteSearch = {
+            query.trim().also { currentCity.value = it }
+            query = ""
+            showSearch = false
+            searchByCity.value = true
+          },
           onDismiss = {showSearch = false},
         )
       }
 
       Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
       ) {
         Header(
-          text = weatherResponse?.name ?: stringResource(id = R.string.loading)
+          text = weatherResponse.name
         )
 
         IconButton(onClick = {showSearch = !showSearch}) {
@@ -111,15 +127,21 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
           modifier = Modifier.size(20.dp)
         ) {
           Icon(
-            imageVector = if (currentCity.value.isBlank()) Icons.Outlined.LocationOn else Icons.Outlined.LocationOff,
+            imageVector = when { currentCity.value.isBlank() ->
+              Icons.Outlined.LocationOn
+              else -> Icons.Outlined.Refresh
+            },
             contentDescription = "Current location",
             modifier = Modifier.width(20.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            tint = when { currentCity.value.isBlank() ->
+              MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+              else -> MaterialTheme.colorScheme.onSurfaceVariant
+            },
           )
         }
         Spacer(modifier = Modifier.width(5.dp))
         Text(
-          text = "${weatherResponse?.coord?.lat?.toInt().toString()}° ${weatherResponse?.coord?.lon?.toInt().toString()}°",
+          text = "${weatherResponse.coord.lat.toInt()}° ${weatherResponse.coord.lon.toInt()}°",
           style = MaterialTheme.typography.titleSmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
           textAlign = TextAlign.Center,
@@ -134,7 +156,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
         Column {
           Row {
             Text(
-              text = weatherResponse?.main?.temp?.toInt().toString(),
+              text = weatherResponse.main.temp.toInt().toString(),
               style = MaterialTheme.typography.displayLarge,
               textAlign = TextAlign.Center,
               fontWeight = FontWeight.Bold
@@ -152,7 +174,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
           Spacer(modifier = Modifier.height(10.dp))
 
           Text(
-            text = weatherResponse?.weather?.get(0)?.main ?: stringResource(id = R.string.loading),
+            text = weatherResponse.weather[0].main,
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
           )
@@ -162,14 +184,14 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
           Row {
             Row {
               Icon(imageVector = Icons.Outlined.ArrowUpward, contentDescription = "high")
-              Text(text = weatherResponse?.main?.temp_max?.toInt().toString())
+              Text(text = weatherResponse.main.temp_max.toInt().toString())
             }
 
             Spacer(modifier = Modifier.width(6.dp))
 
             Row {
               Icon(imageVector = Icons.Outlined.ArrowDownward, contentDescription = "low")
-              Text(text = weatherResponse?.main?.temp_min?.toInt().toString())
+              Text(text = weatherResponse.main.temp_min.toInt().toString())
             }
           }
         }
@@ -195,7 +217,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-              text = weatherResponse?.main?.humidity.toString() + " %",
+              text = weatherResponse.main.humidity.toString() + " %",
               color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
             )
           }
@@ -216,7 +238,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-              text = weatherResponse?.wind?.speed.toString() + " m",
+              text = weatherResponse.wind.speed.toString() + " m",
               color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
             )
           }
@@ -247,7 +269,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
                 Icon(imageVector = Icons.Outlined.Compress, contentDescription = "pressure")
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                  text = weatherResponse?.main?.pressure.toString() + " hPa",
+                  text = weatherResponse.main.pressure.toString() + " hPa",
                   style = MaterialTheme.typography.titleSmall
                 )
               }
@@ -266,16 +288,19 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
           ) {
             Column {
               Text(
-                text = stringResource(id = R.string.feel_like),
+                text = stringResource(id = R.string.feel_like) + "       ",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
               )
               Spacer(modifier = Modifier.height(10.dp))
               Row {
-                Icon(imageVector = Icons.Default.TagFaces, contentDescription = "feels")
+                Icon(
+                  imageVector = Icons.Default.TagFaces,
+                  contentDescription = "feels"
+                )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                  text = "${weatherResponse?.main?.feels_like?.toInt().toString()} °C    ",
+                  text = "${weatherResponse.main.feels_like.toInt()} °C    ",
                   style = MaterialTheme.typography.titleSmall
                 )
               }
@@ -303,7 +328,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
                 Icon(imageVector = Icons.Outlined.Cloud, contentDescription = "cloud")
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                  text = weatherResponse?.clouds?.all.toString() + " %",
+                  text = weatherResponse.clouds.all.toString() + " %",
                   style = MaterialTheme.typography.titleSmall
                 )
               }
@@ -327,13 +352,39 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, 
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.padding(start = 10.dp)
               )
-              Spacer(modifier = Modifier.height(10.dp))
-              Row {
-                Icon(imageVector = Icons.Outlined.Description, contentDescription = "description")
+              Spacer(modifier = Modifier.height(5.dp))
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.width(125.dp)
+              ) {
+                IconButton(
+                  onClick = { showPopup = true },
+                  modifier = Modifier.size(30.dp)
+                ) {
+                  Icon(
+                    imageVector =  when {weatherResponse.weather[0].description.capitalize(Locale.current).length > 10 ->
+                      Icons.Outlined.MoreHoriz
+                      else -> Icons.Outlined.Description
+                    },
+                    contentDescription = "description"
+                  )
+                }
                 Spacer(modifier = Modifier.width(10.dp))
-                weatherResponse?.weather?.get(0)?.description?.let {
+                Text(
+                  text = weatherResponse.weather[0].description.capitalize(Locale.current),
+                  style = MaterialTheme.typography.titleSmall,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis
+                )
+
+                DropdownMenu(
+                  expanded = showPopup,
+                  onDismissRequest = { showPopup = false },
+                  modifier = Modifier.padding(horizontal = 10.dp)
+                ) {
                   Text(
-                    text = it.capitalize(Locale.current), style = MaterialTheme.typography.titleSmall
+                    text = weatherResponse.weather[0].description.capitalize(Locale.current),
+                    style = MaterialTheme.typography.titleSmall,
                   )
                 }
               }

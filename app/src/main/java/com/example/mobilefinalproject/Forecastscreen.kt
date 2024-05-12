@@ -251,13 +251,12 @@ fun WeatherItem(weatherItem: WeatherItem) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForecastScreen(navController: NavController, forecastResponse: ForecastResponse?) {
+fun ForecastScreen(navController: NavController, forecastResponse: ForecastResponse) {
   var selectedItem by rememberSaveable { mutableIntStateOf(1) }
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-  val groupedByDay = forecastResponse?.list
-    ?.groupBy { weatherItem -> LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE) }
-    ?: mapOf()
+  val groupedByDay = forecastResponse.list
+    .groupBy { weatherItem -> LocalDate.parse(weatherItem.dt_txt.substring(0, 10), DateTimeFormatter.ISO_DATE) }
 
   val averagedList = groupedByDay.map { (_, weatherItems: List<WeatherItem>) ->
     val avgTemp = weatherItems.map { it.main.temp }.average()

@@ -49,11 +49,28 @@ data class ForecastSys(
 
 data class City(
   val id: Int,
-  val name: String,
+  var name: String,
   val coord: Coord,
   val country: String,
   val population: Int,
   val timezone: Int,
   val sunrise: Long,
   val sunset: Long
+)
+
+val emptyForecastResponse = ForecastResponse(
+  cod = "...",
+  message = 0,
+  cnt = 0,
+  list = emptyList(),
+  city = City(
+    id = 0,
+    name = "...",
+    coord = Coord(0.0, 0.0),
+    country = "...",
+    population = 0,
+    timezone = 0,
+    sunrise = 0,
+    sunset = 0
+  )
 )

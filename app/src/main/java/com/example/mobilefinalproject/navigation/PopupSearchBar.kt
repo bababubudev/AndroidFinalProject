@@ -1,12 +1,19 @@
 package com.example.mobilefinalproject.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,11 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.mobilefinalproject.R
 
@@ -67,20 +76,38 @@ fun PopupSearchBar(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             modifier = Modifier
               .weight(4f)
-              .background(MaterialTheme.colorScheme.background)
-              .focusRequester(focusRequester)
+              .background(
+                MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(
+                  topStart = 10.dp,
+                  topEnd = 10.dp,
+                  bottomStart = 5.dp,
+                  bottomEnd = 5.dp
+                ),
+              )
+              .focusRequester(focusRequester),
           )
 
+          Spacer(modifier = Modifier.width(10.dp))
+
           IconButton(
+            enabled = query.isNotEmpty(),
             onClick = {
               onExecuteSearch()
               openDialog = false
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).height(100.dp).padding(top = 5.dp)
           ) {
             Icon(
-              imageVector = Icons.Default.Search,
+              imageVector = Icons.Outlined.Search,
               contentDescription = "Search",
+              modifier = Modifier.clip(CircleShape)
+              .background(
+                MaterialTheme.colorScheme.background,
+                shape = CircleShape,
+              )
+              .border(2.dp, MaterialTheme.colorScheme.onSecondary, CircleShape)
+              .padding(15.dp)
             )
           }
         }
