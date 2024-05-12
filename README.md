@@ -6,7 +6,8 @@
 ## Features
 - Shows temperature and weather info
 - Weather forecast for upto 5 days
-- Implemented localization for Finnish language 
+- Implemented localization for Finnish language
+- Geographical location search functionality
 
 ## Screenshots
 
