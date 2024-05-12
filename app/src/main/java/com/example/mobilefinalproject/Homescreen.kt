@@ -126,7 +126,6 @@ fun HomeScreen(
         IconButton(
           onClick = { query = ""; restart() },
           modifier = Modifier.size(20.dp),
-          enabled = searchByCity.value
         ) {
           Icon(
             imageVector = when { !searchByCity.value ->
@@ -134,7 +133,11 @@ fun HomeScreen(
               else -> Icons.Outlined.Refresh
             },
             contentDescription = "Current location",
-            modifier = Modifier.width(20.dp)
+            modifier = Modifier.width(20.dp),
+            tint = when { !searchByCity.value ->
+              MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+              else -> MaterialTheme.colorScheme.onSurfaceVariant
+            },
           )
         }
         Spacer(modifier = Modifier.width(5.dp))
