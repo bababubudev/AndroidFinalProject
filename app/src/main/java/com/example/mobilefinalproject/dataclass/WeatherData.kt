@@ -59,14 +59,14 @@ val emptyWeatherResponse = WeatherResponse(
   weather = listOf(
     Weather(
       id = 800,
-      main = "Clear",
-      description = "clear sky",
+      main = "...",
+      description = "... ...",
       icon = "01d"
     )
   ),
   base = "...",
   main = Main(
-    temp = 20.0,
+    temp = 0.0,
     feels_like = 19.0,
     temp_min = 18.0,
     temp_max = 22.0,

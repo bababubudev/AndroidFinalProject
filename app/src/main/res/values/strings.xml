@@ -12,15 +12,12 @@
     <string name="language">Select language</string>
     <string name="permission_req">Permission Required</string>
     <string name="permission_grant">Permission Granted</string>
-    <string name="loading">fetching location</string>
     <string name="forecast_title">Forecast for 5 days</string>
     <string name="temp">Temperature</string>
     <string name="humid">Humidity</string>
     <string name="wind">Wind</string>
     <string name="restart">Restart</string>
-    <string name="loading_fail">turn location on and restart!</string>
-    <string name="loading_data">fetching weather</string>
-    <string name="data_failed">failed to fetch :/</string>
+    <string name="loading_data">Loading</string>
     <string name="search">Search</string>
     <string name="search_box">Search for places</string>
 </resources>

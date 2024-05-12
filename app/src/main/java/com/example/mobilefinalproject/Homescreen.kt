@@ -59,12 +59,13 @@ import com.example.mobilefinalproject.components.Header
 import com.example.mobilefinalproject.dataclass.WeatherResponse
 import com.example.mobilefinalproject.navigation.BottomNavbar
 import com.example.mobilefinalproject.navigation.PopupSearchBar
+import com.example.mobilefinalproject.utils.LocationViewModel
 
 @Composable
 fun HomeScreen(
   navController: NavController,
   weatherResponse: WeatherResponse,
-  currentCity: MutableState<String>,
+  locationModel: LocationViewModel,
   searchByCity: MutableState<Boolean>,
   restart: () -> Unit
 ) {
@@ -94,7 +95,7 @@ fun HomeScreen(
           query = query,
           onQueryChange = {newQuery -> query = newQuery},
           onExecuteSearch = {
-            query.trim().also { currentCity.value = it }
+            query.trim().also { locationModel.updateCity(it) }
             query = ""
             showSearch = false
             searchByCity.value = true
@@ -124,19 +125,16 @@ fun HomeScreen(
       Row {
         IconButton(
           onClick = { query = ""; restart() },
-          modifier = Modifier.size(20.dp)
+          modifier = Modifier.size(20.dp),
+          enabled = searchByCity.value
         ) {
           Icon(
-            imageVector = when { currentCity.value.isBlank() ->
+            imageVector = when { !searchByCity.value ->
               Icons.Outlined.LocationOn
               else -> Icons.Outlined.Refresh
             },
             contentDescription = "Current location",
-            modifier = Modifier.width(20.dp),
-            tint = when { currentCity.value.isBlank() ->
-              MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-              else -> MaterialTheme.colorScheme.onSurfaceVariant
-            },
+            modifier = Modifier.width(20.dp)
           )
         }
         Spacer(modifier = Modifier.width(5.dp))
@@ -202,12 +200,33 @@ fun HomeScreen(
           horizontalAlignment = Alignment.End
         ) {
           Spacer(modifier = Modifier.height(15.dp))
-          
+
           Row(
             modifier = Modifier
-              .clip(RoundedCornerShape(15.dp))
+              .clip(RoundedCornerShape(10.dp))
               .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
-              .border(2.dp, Color.Transparent, RoundedCornerShape(15.dp))
+              .border(2.dp, Color.Transparent, RoundedCornerShape(10.dp))
+              .padding(horizontal = 10.dp, vertical = 8.dp)
+          ) {
+            Icon(
+              imageVector = Icons.Outlined.WindPower,
+              contentDescription = "Wind",
+              tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+              text = weatherResponse.wind.speed.toInt().toString() + " m",
+              color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+            )
+          }
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          Row(
+            modifier = Modifier
+              .clip(RoundedCornerShape(10.dp))
+              .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+              .border(2.dp, Color.Transparent, RoundedCornerShape(10.dp))
               .padding(horizontal = 10.dp, vertical = 8.dp)
           ) {
             Icon(
@@ -218,27 +237,6 @@ fun HomeScreen(
             Spacer(modifier = Modifier.width(10.dp))
             Text(
               text = weatherResponse.main.humidity.toString() + " %",
-              color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-            )
-          }
-          
-          Spacer(modifier = Modifier.height(10.dp))
-          
-          Row(
-            modifier = Modifier
-              .clip(RoundedCornerShape(15.dp))
-              .background(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
-              .border(2.dp, Color.Transparent, RoundedCornerShape(15.dp))
-              .padding(horizontal = 10.dp, vertical = 8.dp)
-          ) {
-            Icon(
-              imageVector = Icons.Outlined.WindPower,
-              contentDescription = "Wind",
-              tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(
-              text = weatherResponse.wind.speed.toString() + " m",
               color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
             )
           }

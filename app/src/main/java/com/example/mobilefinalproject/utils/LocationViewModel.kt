@@ -10,7 +10,14 @@ class LocationViewModel: ViewModel() {
   var currentLocation by mutableStateOf<LocationData?>(null)
     private set
 
+  var chosenCity by mutableStateOf("")
+    private set
+
   fun updateLocation(location: LocationData) {
     currentLocation = location
+  }
+
+  fun updateCity(city: String) {
+    chosenCity = city
   }
 }

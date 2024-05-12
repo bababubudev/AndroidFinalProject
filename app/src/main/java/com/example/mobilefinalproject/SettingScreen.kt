@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
@@ -91,8 +91,11 @@ fun SettingScreen(
           },
           thumbContent = {
             Icon(
-              imageVector = when {darkThemeState.value -> Icons.Default.DarkMode else -> Icons.Default.LightMode },
-              contentDescription = "Add icon"
+              imageVector = when {darkThemeState.value ->
+                Icons.Default.DarkMode
+                else -> Icons.Default.Lightbulb
+              },
+              contentDescription = "Add icon",
             )
           },
         )
