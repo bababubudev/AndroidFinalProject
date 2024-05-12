@@ -24,4 +24,21 @@ interface APIService {
     @Query("appid") appid: String,
     @Query("lang") lang: String = "en"
   ): ForecastResponse
+
+  @GET("weather")
+  suspend fun getWeatherByCity(
+    @Query("q") city: String,
+    @Query("units") units: String,
+    @Query("appid") appid: String,
+    @Query("lang") lang: String = "en"
+  ): WeatherResponse
+
+  @GET("forecast")
+  suspend fun getForecastByCity(
+    @Query("q") city: String,
+    @Query("cnt") count: Int,
+    @Query("units") units: String,
+    @Query("appid") appid: String,
+    @Query("lang") lang: String = "en"
+  ): ForecastResponse
 }

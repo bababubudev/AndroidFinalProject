@@ -21,4 +21,6 @@
     <string name="loading_fail">turn location on and restart!</string>
     <string name="loading_data">fetching weather</string>
     <string name="data_failed">failed to fetch :/</string>
+    <string name="search">Search</string>
+    <string name="search_box">Search for places</string>
 </resources>

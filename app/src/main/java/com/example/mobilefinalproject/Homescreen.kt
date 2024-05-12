@@ -2,6 +2,7 @@ package com.example.mobilefinalproject
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,18 +21,24 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.LocationOff
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.icons.outlined.WindPower
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,10 +55,14 @@ import androidx.navigation.NavController
 import com.example.mobilefinalproject.components.Header
 import com.example.mobilefinalproject.dataclass.WeatherResponse
 import com.example.mobilefinalproject.navigation.BottomNavbar
+import com.example.mobilefinalproject.navigation.PopupSearchBar
 
 @Composable
-fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) {
+fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?, currentCity: MutableState<String>, restart: () -> Unit) {
   var selectedItem by rememberSaveable { mutableIntStateOf(0) }
+
+  var showSearch by rememberSaveable { mutableStateOf(false) }
+  var query by remember { mutableStateOf("") }
 
   Scaffold(bottomBar = {
     BottomNavbar(
@@ -67,17 +79,44 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
     )
     {
       Spacer(modifier = Modifier.height(30.dp))
-      Header(
-        text = weatherResponse?.name ?: stringResource(id = R.string.loading)
-      )
+      if (showSearch) {
+        PopupSearchBar(
+          query = query,
+          onQueryChange = {newQuery -> query = newQuery},
+          onExecuteSearch = { currentCity.value = query.trim(); query = ""; showSearch = false },
+          onDismiss = {showSearch = false},
+        )
+      }
+
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        Header(
+          text = weatherResponse?.name ?: stringResource(id = R.string.loading)
+        )
+
+        IconButton(onClick = {showSearch = !showSearch}) {
+          Icon(
+            imageVector = Icons.Outlined.Search,
+            contentDescription = "search locations",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+          )
+        }
+      }
 
       Row {
-        Icon(
-          imageVector = Icons.Outlined.LocationOn,
-          contentDescription = "Current location",
-          modifier = Modifier.width(20.dp),
-          tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-        )
+        IconButton(
+          onClick = { query = ""; restart() },
+          modifier = Modifier.size(20.dp)
+        ) {
+          Icon(
+            imageVector = if (currentCity.value.isBlank()) Icons.Outlined.LocationOn else Icons.Outlined.LocationOff,
+            contentDescription = "Current location",
+            modifier = Modifier.width(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+          )
+        }
         Spacer(modifier = Modifier.width(5.dp))
         Text(
           text = "${weatherResponse?.coord?.lat?.toInt().toString()}° ${weatherResponse?.coord?.lon?.toInt().toString()}°",
@@ -236,7 +275,7 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
                 Icon(imageVector = Icons.Default.TagFaces, contentDescription = "feels")
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                  text = "${weatherResponse?.main?.feels_like?.toInt().toString()} °C",
+                  text = "${weatherResponse?.main?.feels_like?.toInt().toString()} °C    ",
                   style = MaterialTheme.typography.titleSmall
                 )
               }
@@ -285,7 +324,8 @@ fun HomeScreen(navController: NavController, weatherResponse: WeatherResponse?) 
               Text(
                 text = stringResource(id = R.string.description),
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.padding(start = 10.dp)
               )
               Spacer(modifier = Modifier.height(10.dp))
               Row {

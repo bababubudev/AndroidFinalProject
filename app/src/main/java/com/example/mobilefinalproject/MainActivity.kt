@@ -100,7 +100,6 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
           LaunchedEffect(Unit) {
-            isLoading.value = true
             loadingString.intValue = R.string.loading
             locationClient
               .getLocationUpdates(10000L)
@@ -149,49 +148,73 @@ private fun Main(
 
   var currentWeather by remember { mutableStateOf<WeatherResponse?>(null) }
   var forecastWeather by remember { mutableStateOf<ForecastResponse?>(null) }
+  val currentCity = remember { mutableStateOf("") }
 
   val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
   if (!locationPermissionState.status.isGranted) {
     isLoading.value = false
+    currentCity.value = "Tampere"
   }
 
-  LaunchedEffect(locationPermissionState.status.isGranted) {
-    if (locationPermissionState.status.isGranted) {
-      isLoading.value = true
-      loadingString.value = R.string.loading
-      locationClient
-        .getLocationUpdates(1000L)
-        .catch {
-            e -> e.printStackTrace()
-          loadingString.value =  R.string.loading_fail
-        }
-        .collect { location ->
-          val lat = location.latitude
-          val lon = location.longitude
-          locationModel.updateLocation(LocationData(lat, lon))
-          isLoading.value = false
-        }
-    }
-  }
-
-  val lat = locationModel.currentLocation?.latitude
-  val lon = locationModel.currentLocation?.longitude
-  Log.d("Location", "Lat: $lat, Long: $lon")
-
-  if (lat != null && lon != null) {
-    LaunchedEffect(Unit) {
+  if (currentCity.value.isNotEmpty() || currentCity.value.isNotBlank()) {
+    LaunchedEffect(currentCity.value) {
       try {
         isLoading.value = true
         loadingString.value = R.string.loading_data
-        currentWeather = retrofitInstance.getWeather(lon, lat, "metric", BuildConfig.API_KEY)
-        forecastWeather = retrofitInstance.getForecast(lon, lat, 40, "metric", BuildConfig.API_KEY)
+        currentWeather = retrofitInstance.getWeatherByCity(currentCity.value.trim().lowercase(), "metric", BuildConfig.API_KEY)
+        forecastWeather = retrofitInstance.getForecastByCity(currentCity.value.trim().lowercase(), 40, "metric", BuildConfig.API_KEY)
         isLoading.value = false
       } catch (e: LocationClient.LocationException) {
         println("Location Exception: ${e.message}")
         loadingString.value = R.string.data_failed
       } catch (e: Exception) {
         isLoading.value = false
+        currentCity.value = ""
         println("General Exception: ${e.message}")
+      }
+    }
+  }
+  else{
+    LaunchedEffect(locationPermissionState.status.isGranted) {
+      if (locationPermissionState.status.isGranted) {
+        isLoading.value = true
+        loadingString.value = R.string.loading
+        locationClient
+          .getLocationUpdates(1000L)
+          .catch {
+            e -> e.printStackTrace()
+            currentCity.value = "Tampere"
+            isLoading.value = false
+          }
+          .collect { location ->
+            val lat = location.latitude
+            val lon = location.longitude
+
+            locationModel.updateLocation(LocationData(lat, lon))
+            isLoading.value = false
+          }
+      }
+    }
+
+    val lat = locationModel.currentLocation?.latitude
+    val lon = locationModel.currentLocation?.longitude
+    Log.d("Location", "Lat: $lat, Long: $lon")
+
+    if (lat != null && lon != null) {
+      LaunchedEffect(Unit) {
+        try {
+          isLoading.value = true
+          loadingString.value = R.string.loading_data
+          currentWeather = retrofitInstance.getWeather(lon, lat, "metric", BuildConfig.API_KEY, languageManager.getLanguage() ?: "en")
+          forecastWeather = retrofitInstance.getForecast(lon, lat, 40, "metric", BuildConfig.API_KEY, languageManager.getLanguage() ?: "en")
+          isLoading.value = false
+        } catch (e: LocationClient.LocationException) {
+          println("Location Exception: ${e.message}")
+          loadingString.value = R.string.data_failed
+        } catch (e: Exception) {
+          isLoading.value = false
+          println("General Exception: ${e.message}")
+        }
       }
     }
   }
@@ -202,7 +225,7 @@ private fun Main(
       startDestination = if (locationPermissionState.status.isGranted) "Today" else "Settings",
     ) {
       if (locationPermissionState.status.isGranted) {
-        composable("Today") { HomeScreen(navController, currentWeather) }
+        composable("Today") { HomeScreen(navController, currentWeather, currentCity, restartApp) }
         composable("5 Days") { ForecastScreen(navController, forecastWeather) }
         composable("Settings") {
           SettingScreen(
@@ -229,12 +252,8 @@ private fun Main(
 
         composable("Today") { settingComp() }
         composable("5 Days") { settingComp() }
-        composable("Settings") {
-          settingComp()
-        }
+        composable("Settings") { settingComp() }
       }
-
-
     }
 
     if (isLoading.value) {
